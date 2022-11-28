@@ -5,3 +5,4 @@
 !READ.ME
 
 !/src/**
+src/__pycache__/**
