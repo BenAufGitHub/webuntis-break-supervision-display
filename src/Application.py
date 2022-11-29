@@ -50,7 +50,22 @@ class MainFrame(Tk):
 
 
     def create_layout(self):
-        pass
+        self.configure_variables()
+        # TODO
+
+
+    def configure_variables(self):
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        width = 1000
+        height = 600
+        x = (screen_width-width)/2
+        y = (screen_height-height)/2
+
+        self.title('Pausenaufsicht')
+        self.geometry(f'{width}x{height}+{int(x)}+{int(y)}')
+        self.resizable(True, True)
+        # TODO icon
 
 
     def selectDisplayPanel(self):
