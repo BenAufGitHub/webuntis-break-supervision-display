@@ -69,7 +69,7 @@ class MainFrame(tk.Tk):
 
 
     def selectDisplayFrame(self, session: webuntis.Session):
-        frame = DisplayFrame(parent=self)
+        frame = DisplayFrame(parent=self, session=session)
         frame.grid(row=0, column=0) 
         frame.pack(anchor=tk.N, fill=tk.BOTH, expand=True, side=tk.LEFT )
 
@@ -92,7 +92,44 @@ class FillerFrame(tk.Frame):
 
 
 class DisplayFrame(FillerFrame):
-    pass
+    
+    def __init__(self, parent, session: webuntis.Session):
+        super().__init__(parent)
+        self.session = session
+        self._build(session)
+
+
+    def _build(self, session: webuntis.Session):
+        settings_bar = self._create_settings_bar()
+        table_frame = self._create_table_frame()
+        exit_bar = self._create_exit_bar()
+
+        self._pack_contents(settings_bar, table_frame, exit_bar)
+
+
+    def _pack_contents(self, settings_bar, table_frame, exit_bar):
+        settings_bar.pack(anchor=tk.N, fill=tk.X, expand=False, side=tk.TOP )
+        table_frame.pack(fill=tk.BOTH, expand=True, side=tk.TOP)
+        exit_bar.pack(anchor=tk.N, fill=tk.X, expand=False, side=tk.TOP)
+
+
+    def _create_settings_bar(self):
+        settings_bar = tk.Frame(self, bg=Constants.BACKGROUND, height=60, relief='groove', highlightthickness=2)
+        retry = tk.Button(settings_bar, text="\u21BA", padx=5, pady=5)
+        retry.place(x=20, y=13)
+        return settings_bar
+
+    def _create_table_frame(self):
+        frame = tk.Frame(self, bg=Constants.BACKGROUND)
+        return frame
+
+    def _create_exit_bar(self):
+        exit_bar = tk.Frame(self, bg=Constants.BACKGROUND, height=80, relief='groove', highlightthickness=2)
+        b1 = tk.Button(exit_bar, padx=5, text="LogOut")
+        b2 = tk.Button(exit_bar, padx=5, text="Beenden")
+        b1.place(relx=0.45, rely=0.5, anchor=tk.E)
+        b2.place(relx=0.55, rely=0.5, anchor=tk.W)
+        return exit_bar
 
 
 
