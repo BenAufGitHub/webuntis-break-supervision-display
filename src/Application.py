@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import webuntis
+import src.UntisBreaks as UntisBreaks
 
 
 class Constants:
@@ -96,10 +97,11 @@ class DisplayFrame(FillerFrame):
     def __init__(self, parent, session: webuntis.Session):
         super().__init__(parent)
         self.session = session
-        self._build(session)
+        self.data = None
+        self._build()
 
 
-    def _build(self, session: webuntis.Session):
+    def _build(self):
         settings_bar = self._create_settings_bar()
         table_frame = self._create_table_frame()
         exit_bar = self._create_exit_bar()
@@ -136,10 +138,43 @@ class DisplayFrame(FillerFrame):
 
     def _create_table_frame(self):
         frame = FillerFrame(self)
-        self._create_arrow(frame, '\u2B9C').pack(anchor=tk.W, fill=tk.Y, side=tk.LEFT)
+        self.fetch_break_info()
+        self._create_arrow(frame, '\u2B9C', -1).pack(anchor=tk.W, fill=tk.Y, side=tk.LEFT)
         self._create_table(frame).pack(anchor=tk.W, fill=tk.BOTH, expand=True, side=tk.LEFT)
-        self._create_arrow(frame, "\u2B9E").pack(anchor=tk.W, fill=tk.Y, side=tk.LEFT)
+        self._create_arrow(frame, "\u2B9E", 1).pack(anchor=tk.W, fill=tk.Y, side=tk.LEFT)
         return frame
+
+
+    def _create_arrow(self, parent, text, offset):
+        arrow_frame = FillerFrame(parent, width=120)
+
+        arrow = tk.Button(arrow_frame, text=text)
+        arrow.configure(borderwidth=0, font=("Arial", 30))
+        self._toggle_button(arrow, offset)
+        arrow.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        return arrow_frame
+
+
+    '''
+    whether a previous/next pause exists decides whether arrow should be activated or not
+    @param arrow: arrow-button to toggle
+    @param offset: how many breaks too look back or forward to. Since the arrows only change break position by one, this value should be 1 or -1.
+    '''
+    def _toggle_button(self, arrow, offset):
+        bg=Constants().BACKGROUND
+        # if not null
+        if UntisBreaks.get_relative_break(self.currentBreak, self.data.keys(), offset):
+            arrow["state"] = "normal"
+            return arrow.configure(activeforeground="blue", bg=bg, activebackground=bg, foreground="black")
+        arrow["state"] = "disabled"
+        arrow.configure(activeforeground=bg, bg=bg, activebackground=bg, foreground="gray")
+
+
+    def _on_button_press(self, event):
+        event.widget.configure(bg="red")
+
+
+    # ==== inner Table ====>
 
 
     def _create_table(self, parent):
@@ -147,18 +182,11 @@ class DisplayFrame(FillerFrame):
         return table
 
 
-    def _create_arrow(self, parent, text):
-        bg=Constants().BACKGROUND
-        arrow_frame = FillerFrame(parent, width=120)
+    # TODO try-catch connection -> send back to login frame + Error-Popup
+    def fetch_break_info(self):
+        self.data = UntisBreaks.get_todays_supervisions(self.session)
+        self.currentBreak = UntisBreaks.next_break_time(self.data.keys())
 
-        arrow = tk.Button(arrow_frame, text=text)
-        arrow.configure(borderwidth=0, font=("Arial", 30), activeforeground="blue", bg=bg, activebackground=bg)
-        arrow.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
-        return arrow_frame
-
-
-    def _on_button_press(self, event):
-        event.widget.configure(bg="red")
 
 
 
