@@ -86,8 +86,8 @@ class MainFrame(tk.Tk):
 
 
 class FillerFrame(tk.Frame):
-    def __init__(self, parent):
-        super().__init__(parent, bg=Constants.BACKGROUND)
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, **{"bg":Constants.BACKGROUND, **kwargs})
 
 
 
