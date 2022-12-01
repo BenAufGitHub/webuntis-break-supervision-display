@@ -121,10 +121,6 @@ class DisplayFrame(FillerFrame):
         return settings_bar
 
 
-    def _create_table_frame(self):
-        frame = tk.Frame(self, bg=Constants.BACKGROUND)
-        return frame
-
     def _create_exit_bar(self):
         exit_bar = tk.Frame(self, bg=Constants.BACKGROUND, height=80, relief='groove', highlightthickness=2)
         b1 = tk.Button(exit_bar, padx=5, text="LogOut")
@@ -132,6 +128,38 @@ class DisplayFrame(FillerFrame):
         b1.place(relx=0.45, rely=0.5, anchor=tk.E)
         b2.place(relx=0.55, rely=0.5, anchor=tk.W)
         return exit_bar
+
+
+
+    # =============== middle frame =================>
+
+
+    def _create_table_frame(self):
+        frame = FillerFrame(self)
+        self._create_arrow(frame, '\u2B9C').pack(anchor=tk.W, fill=tk.Y, side=tk.LEFT)
+        self._create_table(frame).pack(anchor=tk.W, fill=tk.BOTH, expand=True, side=tk.LEFT)
+        self._create_arrow(frame, "\u2B9E").pack(anchor=tk.W, fill=tk.Y, side=tk.LEFT)
+        return frame
+
+
+    def _create_table(self, parent):
+        table = FillerFrame(parent, bg="blue")
+        return table
+
+
+    def _create_arrow(self, parent, text):
+        bg=Constants().BACKGROUND
+        arrow_frame = FillerFrame(parent, width=120)
+
+        arrow = tk.Button(arrow_frame, text=text)
+        arrow.configure(borderwidth=0, font=("Arial", 30), activeforeground="blue", bg=bg, activebackground=bg)
+        arrow.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        return arrow_frame
+
+
+    def _on_button_press(self, event):
+        event.widget.configure(bg="red")
+
 
 
 
