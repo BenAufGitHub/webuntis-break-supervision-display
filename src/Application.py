@@ -101,6 +101,12 @@ class DisplayFrame(FillerFrame):
         self._build()
 
 
+    # TODO try-catch connection -> send back to login frame + Error-Popup
+    def fetch_break_info(self):
+        self.data = UntisBreaks.get_todays_supervisions(self.session)
+        self.currentBreak = UntisBreaks.next_break_time(self.data.keys())
+
+
     def _build(self):
         settings_bar = self._create_settings_bar()
         table_frame = self._create_table_frame()
@@ -179,13 +185,21 @@ class DisplayFrame(FillerFrame):
 
     def _create_table(self, parent):
         table = FillerFrame(parent, bg="blue")
+        self._addTime(table)
+        FillerFrame(table, bg="blue").pack(anchor=tk.N, fill=tk.BOTH, expand=True, side=tk.TOP)
         return table
 
 
-    # TODO try-catch connection -> send back to login frame + Error-Popup
-    def fetch_break_info(self):
-        self.data = UntisBreaks.get_todays_supervisions(self.session)
-        self.currentBreak = UntisBreaks.next_break_time(self.data.keys())
+    def _addTime(self, parent):
+        upperside = FillerFrame(parent, height=70)
+        tk.Label(upperside, text=self._getTime(), padx=5, pady=5, bg=Constants.BACKGROUND, font=("Courier", 18)).pack(anchor=tk.W)
+        upperside.pack(anchor=tk.N, fill=tk.X, expand=False, side=tk.TOP)
+
+
+    def _getTime(self):
+        date=self.currentBreak
+        return f"Start: {date.hour}:{date.minute}"
+
 
 
 
