@@ -115,9 +115,11 @@ class DisplayFrame(FillerFrame):
 
     def _create_settings_bar(self):
         settings_bar = tk.Frame(self, bg=Constants.BACKGROUND, height=60, relief='groove', highlightthickness=2)
-        retry = tk.Button(settings_bar, text="\u21BA", padx=5, pady=5)
-        retry.place(x=20, y=13)
+        retry = tk.Button(settings_bar, text="\u27F3", padx=-1, pady=-1, font=("SherifSans", 20), borderwidth=0)
+        retry.configure(activeforeground="blue", activebackground=Constants.BACKGROUND, bg=Constants.BACKGROUND)
+        retry.place(x=20, y=3)
         return settings_bar
+
 
     def _create_table_frame(self):
         frame = tk.Frame(self, bg=Constants.BACKGROUND)
