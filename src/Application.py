@@ -113,17 +113,18 @@ class DisplayFrame(FillerFrame):
 
 
     def _build(self):
+        self.fetch_break_info()
         settings_bar = self._create_settings_bar()
-        table_frame = self._create_table_frame()
+        self.table_frame = self._create_table_frame()
         exit_bar = self._create_exit_bar()
 
-        self._pack_contents(settings_bar, table_frame, exit_bar)
+        self._pack_contents(settings_bar, self.table_frame, exit_bar)
 
 
     def _pack_contents(self, settings_bar, table_frame, exit_bar):
         settings_bar.pack(anchor=tk.N, fill=tk.X, expand=False, side=tk.TOP )
         table_frame.pack(fill=tk.BOTH, expand=True, side=tk.TOP)
-        exit_bar.pack(anchor=tk.N, fill=tk.X, expand=False, side=tk.TOP)
+        exit_bar.pack(anchor=tk.N, fill=tk.X, expand=False, side=tk.BOTTOM)
 
 
     def _create_settings_bar(self):
@@ -149,7 +150,6 @@ class DisplayFrame(FillerFrame):
 
     def _create_table_frame(self):
         frame = FillerFrame(self)
-        self.fetch_break_info()
         self._create_arrow(frame, '\u2B9C', -1).pack(anchor=tk.W, fill=tk.Y, side=tk.LEFT)
         self._create_table(frame).pack(anchor=tk.W, fill=tk.BOTH, expand=True, side=tk.LEFT)
         self._create_arrow(frame, "\u2B9E", 1).pack(anchor=tk.W, fill=tk.Y, side=tk.LEFT)
@@ -174,15 +174,20 @@ class DisplayFrame(FillerFrame):
     def _toggle_button(self, arrow, offset):
         bg=Constants().BACKGROUND
         # if not null
-        if UntisBreaks.get_relative_break(self.currentBreak, self.data.keys(), offset):
-            arrow["state"] = "normal"
-            return arrow.configure(activeforeground="blue", bg=bg, activebackground=bg, foreground="black")
-        arrow["state"] = "disabled"
-        arrow.configure(activeforeground=bg, bg=bg, activebackground=bg, foreground="gray")
+        rel_break = UntisBreaks.get_relative_break(self.currentBreak, self.data.keys(), offset)
+        if not rel_break:
+            arrow["state"] = "disabled"
+            return arrow.configure(activeforeground=bg, bg=bg, activebackground=bg, foreground="gray")
+        arrow["state"] = "normal"
+        arrow.configure(activeforeground="blue", bg=bg, activebackground=bg, foreground="black")
+        arrow.config(command=lambda:self._change_table(rel_break))
 
-
-    def _on_button_press(self, event):
-        event.widget.configure(bg="red")
+    
+    def _change_table(self, selected_break_time):
+        self.currentBreak = selected_break_time
+        self.table_frame.destroy()
+        self.table_frame = self._create_table_frame()
+        self.table_frame.pack(fill=tk.BOTH, expand=True, side=tk.TOP)
 
 
     # ==== inner Table ====>
