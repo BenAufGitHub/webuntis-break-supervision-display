@@ -256,7 +256,8 @@ class DisplayFrame(FillerFrame):
 
     def _getTime(self):
         date=self.currentBreak
-        return f"Start: {date.hour}:{date.minute}"
+        minute = date.minute if date.minute > 9 else f"0{date.minute}"
+        return f"Start: {date.hour}:{minute}"
 
 
 
