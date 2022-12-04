@@ -36,7 +36,7 @@ def get_todays_supervisions(session: webuntis.Session) -> dict:
 @return next break considering local time. If there is no upcoming break-datetime, this method returns the last available break
 '''
 def next_break_time(datetime_options: list[datetime.datetime], current:datetime.datetime=None) -> datetime.datetime:
-    if not list:
+    if not datetime_options:
         raise ValueError("Parameter 'datetime_options' (list) can't be empty.")
     current = current if current else datetime.datetime.now()
     sorted_dates = sorted(list(datetime_options)+[current])
