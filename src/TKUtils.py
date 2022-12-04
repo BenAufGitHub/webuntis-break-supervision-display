@@ -50,3 +50,19 @@ class ScrollContainer(tk.Frame):
 
     def get_frame(self) -> tk.Frame:
         return self.frame
+
+
+
+class WidthControlledScrollContainer(ScrollContainer):
+    def __init__(self, parent, grid_item_width: int, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+        self.item_width = grid_item_width
+
+    
+    '''
+    Configures canvas.frame to adjust to canvas-height and -width accordingly.
+    '''
+    def onCanvasConfigure(self, event): 
+        super().onCanvasConfigure(event)
+        grid_width = len(self.frame.winfo_children()) * self.item_width
+        self.canvas.itemconfigure(self._frame_id, width=max(grid_width, self.canvas.winfo_width()))
