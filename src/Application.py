@@ -159,7 +159,7 @@ class DisplayFrame(FillerFrame):
             self._create_table(frame).pack(anchor=tk.W, fill=tk.BOTH, expand=True, side=tk.LEFT)
         else:
             self._create_empty_table(frame).pack(anchor=tk.W, fill=tk.BOTH, expand=True, side=tk.LEFT)
-        self._create_arrow(frame, "\u2B9E", 1).pack(anchor=tk.W, fill=tk.Y, side=tk.LEFT)
+        self._create_arrow(frame, "\u2B9E", 1).pack(anchor=tk.W, fill=tk.Y, side=tk.RIGHT)
         return frame
 
 
