@@ -123,8 +123,8 @@ class DisplayFrame(FillerFrame):
 
     def _pack_contents(self, settings_bar, table_frame, exit_bar):
         settings_bar.pack(anchor=tk.N, fill=tk.X, expand=False, side=tk.TOP )
-        table_frame.pack(fill=tk.BOTH, expand=True, side=tk.TOP)
         exit_bar.pack(anchor=tk.N, fill=tk.X, expand=False, side=tk.BOTTOM)
+        table_frame.pack(fill=tk.BOTH, expand=True, side=tk.TOP)
 
 
     def _create_settings_bar(self):
