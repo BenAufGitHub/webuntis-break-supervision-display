@@ -111,6 +111,10 @@ class DisplayFrame(FillerFrame):
         self.data = UntisBreaks.get_todays_supervisions(self.session)
         self.currentBreak = UntisBreaks.next_break_time(self.data.keys())
 
+    
+    def is_displayable(self):
+        return self.currentBreak
+
 
     def _build(self):
         self.fetch_break_info()
@@ -151,7 +155,10 @@ class DisplayFrame(FillerFrame):
     def _create_table_frame(self):
         frame = FillerFrame(self)
         self._create_arrow(frame, '\u2B9C', -1).pack(anchor=tk.W, fill=tk.Y, side=tk.LEFT)
-        self._create_table(frame).pack(anchor=tk.W, fill=tk.BOTH, expand=True, side=tk.LEFT)
+        if self.is_displayable():
+            self._create_table(frame).pack(anchor=tk.W, fill=tk.BOTH, expand=True, side=tk.LEFT)
+        else:
+            self._create_empty_table(frame).pack(anchor=tk.W, fill=tk.BOTH, expand=True, side=tk.LEFT)
         self._create_arrow(frame, "\u2B9E", 1).pack(anchor=tk.W, fill=tk.Y, side=tk.LEFT)
         return frame
 
@@ -173,11 +180,13 @@ class DisplayFrame(FillerFrame):
     '''
     def _toggle_button(self, arrow, offset):
         bg=Constants().BACKGROUND
-        # if not null
-        rel_break = UntisBreaks.get_relative_break(self.currentBreak, self.data.keys(), offset)
-        if not rel_break:
+        if self.currentBreak:
+            rel_break = UntisBreaks.get_relative_break(self.currentBreak, self.data.keys(), offset)
+        # deactivate if necessary
+        if not (self.currentBreak and rel_break):
             arrow["state"] = "disabled"
             return arrow.configure(activeforeground=bg, bg=bg, activebackground=bg, foreground="gray")
+        # activate
         arrow["state"] = "normal"
         arrow.configure(activeforeground="blue", bg=bg, activebackground=bg, foreground="black")
         arrow.config(command=lambda:self._change_table(rel_break))
@@ -188,6 +197,15 @@ class DisplayFrame(FillerFrame):
         self.table_frame.destroy()
         self.table_frame = self._create_table_frame()
         self.table_frame.pack(fill=tk.BOTH, expand=True, side=tk.TOP)
+
+    
+    def _create_empty_table(self, parent):
+        empty = tk.Frame(parent, bg=Constants().BACKGROUND)
+        empty.pack_propagate(False)
+        label = tk.Label(empty, text="Hier ist nichts zu sehen :/", bg=Constants().BACKGROUND)
+        label.configure(font="Helvetica 10 italic")
+        label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        return empty
 
 
     # ==== inner Table ====>

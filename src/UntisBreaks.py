@@ -37,7 +37,7 @@ def get_todays_supervisions(session: webuntis.Session) -> dict:
 '''
 def next_break_time(datetime_options: list[datetime.datetime], current:datetime.datetime=None) -> datetime.datetime:
     if not datetime_options:
-        raise ValueError("Parameter 'datetime_options' (list) can't be empty.")
+        return None
     current = current if current else datetime.datetime.now()
     sorted_dates = sorted(list(datetime_options)+[current])
     index = sorted_dates.index(current)
@@ -52,6 +52,7 @@ def next_break_time(datetime_options: list[datetime.datetime], current:datetime.
 @return: the datetime of the break at specified offset. If the resulting index is invalid (e.g. < 0) -> returns None (No IndexError)
 '''
 def get_relative_break(selected_datetime: datetime.datetime, datetime_options: list[datetime.datetime], offset) -> datetime.datetime:
+    if not selected_datetime: return None
     if selected_datetime not in datetime_options:
         raise ValueError('Selected_datetime must itself be from datetime_options')
     sdates = sorted(datetime_options)
