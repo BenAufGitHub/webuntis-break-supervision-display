@@ -10,6 +10,9 @@ class Constants:
     HEIGHT=600
     RESIZABLE=True
     BACKGROUND="#93B5E1"
+    C_PERIOD="lightblue"
+    ITEM_WIDTH=200
+
 
 
 class MainFrame(tk.Tk):
@@ -99,6 +102,7 @@ class DisplayFrame(FillerFrame):
         super().__init__(parent)
         self.session = session
         self.data = None
+        self.currentBreak = None
         self._build()
 
 
@@ -187,9 +191,56 @@ class DisplayFrame(FillerFrame):
     def _create_table(self, parent):
         table = FillerFrame(parent, bg="blue")
         self._addTime(table)
-        container = TKUtils.ScrollContainer(table)
+        container = TKUtils.WidthControlledScrollContainer(table, Constants().ITEM_WIDTH)
         container.pack(fill=tk.BOTH, expand=True)
+        self._add_periods_to_grid(container.get_frame())
         return table
+
+
+    def _add_periods_to_grid(self, frame: tk.Frame):
+        frame.rowconfigure(0, weight=1)
+        for i, period in enumerate(self.data[self.currentBreak]):
+            frame.columnconfigure(i, weight=1)
+
+            pFrame = tk.Frame(frame, bg=Constants().C_PERIOD, width=Constants.ITEM_WIDTH, padx=40)
+            pFrame.config(highlightbackground="gray", highlightthickness=1)
+            pFrame.pack_propagate(False)
+            pFrame.columnconfigure(0, weight=1)
+            pFrame.rowconfigure(0, weight=1)
+            pFrame.rowconfigure(1, weight=1)
+
+            self._add_teachers(pFrame, period)
+            self._add_rooms(pFrame, period)
+            pFrame.grid(row=0, column=i, sticky=tk.NSEW)
+
+
+    def _add_teachers(self, parent, period):
+        # gray border frame to fill space
+        borderFrame = tk.Frame(parent, bg="gray", width=Constants().ITEM_WIDTH)
+        borderFrame.pack_propagate(False)
+        borderFrame.grid(row=0, column=0, sticky=tk.NSEW)
+
+        # then frame with pad-bottom=1   => showing gray border
+        tFrame = tk.Frame(borderFrame, bg=Constants.C_PERIOD)
+        tFrame.pack(fill=tk.BOTH, expand=True, side=tk.TOP, anchor=tk.NW, pady=(0,1), padx=(0,0))
+
+        teachers_text = ""
+        for t in period.teachers:
+            teachers_text += t.full_name + "\n"
+
+        tLabel = tk.Label(tFrame, text=teachers_text[:-1], bg=Constants.C_PERIOD)
+        tLabel.pack( side=tk.BOTTOM, pady=(10,20))
+
+
+    def _add_rooms(self, parent, period):
+        rFrame = tk.Frame(parent, bg=Constants().C_PERIOD)
+        rFrame.pack_propagate(False)
+        rFrame.grid(row=1, column=0, sticky=tk.NSEW)
+        room_text = ""
+        for r in period.rooms:
+            room_text += r.long_name + "\n"
+        rLabel = tk.Label(rFrame, text=room_text[:-1], bg=Constants.C_PERIOD)
+        rLabel.pack(side=tk.TOP, pady=(20,10))
 
 
     def _addTime(self, parent):
