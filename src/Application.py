@@ -226,9 +226,9 @@ class DisplayFrame(FillerFrame):
 
         teachers_text = ""
         for t in period.teachers:
-            teachers_text += t.full_name + "\n"
+            teachers_text += t.full_name + "\n" + "\n"
 
-        tLabel = tk.Label(tFrame, text=teachers_text[:-1], bg=Constants.C_PERIOD)
+        tLabel = tk.Label(tFrame, text=teachers_text[:-2], bg=Constants.C_PERIOD, font=("Arial", 10))
         tLabel.pack( side=tk.BOTTOM, pady=(10,20))
 
 
@@ -238,8 +238,8 @@ class DisplayFrame(FillerFrame):
         rFrame.grid(row=1, column=0, sticky=tk.NSEW)
         room_text = ""
         for r in period.rooms:
-            room_text += r.long_name + "\n"
-        rLabel = tk.Label(rFrame, text=room_text[:-1], bg=Constants.C_PERIOD)
+            room_text += r.long_name + "\n" +"\n"
+        rLabel = tk.Label(rFrame, text=room_text[:-2], bg=Constants.C_PERIOD, font=("Arial", 10))
         rLabel.pack(side=tk.TOP, pady=(20,10))
 
 
