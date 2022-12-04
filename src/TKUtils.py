@@ -17,7 +17,7 @@ class ScrollContainer(tk.Frame):
         super().__init__(parent, *args, **kwargs)
         self.canvas = tk.Canvas(self)
         self.frame = tk.Frame(self.canvas)
-        self.scrollbar = tk.Scrollbar(self, orient='horizontal', width=32)
+        self.scrollbar = tk.Scrollbar(self, orient='horizontal', width=16)
 
         self.scrollbar.config(command=self.canvas.xview)
         self.canvas.configure(xscrollcommand=self.scrollbar.set)
