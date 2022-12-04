@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import webuntis
 import src.UntisBreaks as UntisBreaks
+import src.TKUtils as TKUtils
 
 
 class Constants:
@@ -186,7 +187,8 @@ class DisplayFrame(FillerFrame):
     def _create_table(self, parent):
         table = FillerFrame(parent, bg="blue")
         self._addTime(table)
-        FillerFrame(table, bg="blue").pack(anchor=tk.N, fill=tk.BOTH, expand=True, side=tk.TOP)
+        container = TKUtils.ScrollContainer(table)
+        container.pack(fill=tk.BOTH, expand=True)
         return table
 
 
