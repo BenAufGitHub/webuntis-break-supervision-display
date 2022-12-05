@@ -141,7 +141,6 @@ class DisplayFrame(FillerFrame):
     def after_init(self):
         def do():
             self.fetch_break_info()
-            self.fetch_break_info()
             self._change_table(self.currentBreak)
         Thread(target=do).start()
 
