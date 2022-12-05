@@ -246,13 +246,25 @@ class DisplayFrame(FillerFrame):
         # then frame with pad-bottom=1   => showing gray border
         tFrame = tk.Frame(borderFrame, bg=Constants.C_PERIOD)
         tFrame.pack(fill=tk.BOTH, expand=True, side=tk.TOP, anchor=tk.NW, pady=(0,1), padx=(0,0))
-
-        teachers_text = ""
-        for t in period.teachers:
-            teachers_text += t.full_name + "\n" + "\n"
-
+        teachers_text = self._str_teachers(period)
         tLabel = tk.Label(tFrame, text=teachers_text[:-2], bg=Constants.C_PERIOD, font=("Arial", 10))
         tLabel.pack( side=tk.BOTTOM, pady=(10,20))
+
+    '''
+        For unknown reasons, an index error is thrown if the list is empty.
+        Printing the period show a teacher as id=0, but no such teachers exists,
+        therefore I can only reckon this is the webuntis way of saying there is no teacher.
+    '''
+    def _str_teachers(self, period):
+        teachers_text = ""
+        try:
+            for t in period.teachers:
+                teachers_text += t.full_name + "\n" + "\n"
+        except IndexError:
+            pass
+        for t in period.original_teachers:
+            teachers_text += f"({t.full_name})\n\n"
+        return teachers_text if teachers_text else "----"
 
 
     def _add_rooms(self, parent, period):
@@ -262,6 +274,9 @@ class DisplayFrame(FillerFrame):
         room_text = ""
         for r in period.rooms:
             room_text += r.long_name + "\n" +"\n"
+        for r in period.original_rooms:
+            room_text += f"({r.long_name})\n\n"
+        room_text = room_text if room_text else "----"
         rLabel = tk.Label(rFrame, text=room_text[:-2], bg=Constants.C_PERIOD, font=("Arial", 10))
         rLabel.pack(side=tk.TOP, pady=(20,10))
 
