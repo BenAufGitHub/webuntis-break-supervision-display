@@ -107,6 +107,10 @@ class DisplayFrame(FillerFrame):
         self._build()
 
 
+    def finishMainloop(self):
+        self.winfo_toplevel().destroy()
+
+
     def reload_tables(self):
         self._change_table(None, _fEmpty=True, _fMessage="aktualisiert Inhalte...")
         self.update()
@@ -151,7 +155,7 @@ class DisplayFrame(FillerFrame):
     def _create_exit_bar(self):
         exit_bar = tk.Frame(self, bg=Constants.BACKGROUND, height=80, relief='groove', highlightthickness=2)
         b1 = tk.Button(exit_bar, padx=5, text="Log Out")
-        b2 = tk.Button(exit_bar, padx=5, text="Beenden")
+        b2 = tk.Button(exit_bar, padx=5, text="Beenden", command=self.finishMainloop)
         b1.place(relx=0.45, rely=0.5, anchor=tk.E)
         b2.place(relx=0.55, rely=0.5, anchor=tk.W)
         return exit_bar
