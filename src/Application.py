@@ -258,6 +258,7 @@ class DisplayFrame(FillerFrame):
         teachers_text = self._str_teachers(period)
         tLabel = tk.Label(tFrame, text=teachers_text[:-2], font=("Arial", 10))
         tLabel.config(fg=self.getPeriodFG(period), bg=self.getPeriodBG(period))
+        tLabel.bind('<Configure>', lambda e: tLabel.config(wraplength=tLabel.winfo_width()))
         tLabel.pack( side=tk.BOTTOM, pady=(10,20))
 
 
