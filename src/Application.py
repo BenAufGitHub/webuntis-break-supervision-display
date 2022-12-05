@@ -242,6 +242,8 @@ class DisplayFrame(FillerFrame):
     def config_tooltip(self, period, widget):
         if period.code == 'cancelled':
             idlelib.tooltip.Hovertip(widget,'Abgesagte Stunde')
+        if period.code == 'irregular':
+            idlelib.tooltip.Hovertip(widget,'Irreguläre Stunde')
 
 
     def _add_teachers(self, parent, period):
@@ -262,6 +264,8 @@ class DisplayFrame(FillerFrame):
     def getPeriodBG(self, period):
         if period.code=='cancelled':
             return '#ff4d4d'
+        if period.code=='irregular':
+            return '#fc00fc'
         return Constants().C_PERIOD
 
     def getPeriodFG(self, period):
