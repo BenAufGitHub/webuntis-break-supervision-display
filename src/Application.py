@@ -107,6 +107,13 @@ class DisplayFrame(FillerFrame):
         self._build()
 
 
+    def reload_tables(self):
+        self._change_table(None, _fEmpty=True, _fMessage="aktualisiert Inhalte...")
+        self.update()
+        self.fetch_break_info()
+        self._change_table(self.currentBreak)
+
+
     # TODO try-catch connection -> send back to login frame + Error-Popup
     def fetch_break_info(self):
         self.data = UntisBreaks.get_todays_supervisions(self.session)
@@ -136,6 +143,7 @@ class DisplayFrame(FillerFrame):
         settings_bar = tk.Frame(self, bg=Constants.BACKGROUND, height=60, relief='groove', highlightthickness=2)
         retry = tk.Button(settings_bar, text="\u27F3", padx=-1, pady=-1, font=("SherifSans", 20), borderwidth=0)
         retry.configure(activeforeground="blue", activebackground=Constants.BACKGROUND, bg=Constants.BACKGROUND)
+        retry.configure(command=self.reload_tables)
         retry.place(x=20, y=3)
         return settings_bar
 
@@ -153,13 +161,13 @@ class DisplayFrame(FillerFrame):
     # =============== middle frame =================>
 
 
-    def _create_table_frame(self):
+    def _create_table_frame(self, forceEmpty=(False, None)):
         frame = FillerFrame(self)
         self._create_arrow(frame, '\u2B9C', -1).pack(anchor=tk.W, fill=tk.Y, side=tk.LEFT)
-        if self.is_displayable():
+        if not forceEmpty[0] and self.is_displayable():
             self._create_table(frame).pack(anchor=tk.W, fill=tk.BOTH, expand=True, side=tk.LEFT)
         else:
-            self._create_empty_table(frame).pack(anchor=tk.W, fill=tk.BOTH, expand=True, side=tk.LEFT)
+            self._create_empty_table(frame, forceEmpty[1]).pack(anchor=tk.W, fill=tk.BOTH, expand=True, side=tk.LEFT)
         self._create_arrow(frame, "\u2B9E", 1).pack(anchor=tk.W, fill=tk.Y, side=tk.RIGHT)
         return frame
 
@@ -193,17 +201,18 @@ class DisplayFrame(FillerFrame):
         arrow.config(command=lambda:self._change_table(rel_break))
 
     
-    def _change_table(self, selected_break_time):
+    def _change_table(self, selected_break_time, _fEmpty=False, _fMessage=None):
         self.currentBreak = selected_break_time
         self.table_frame.destroy()
-        self.table_frame = self._create_table_frame()
+        self.table_frame = self._create_table_frame(forceEmpty=(_fEmpty, _fMessage))
         self.table_frame.pack(fill=tk.BOTH, expand=True, side=tk.TOP)
 
     
-    def _create_empty_table(self, parent):
+    def _create_empty_table(self, parent, message):
+        msg = message if message else "Hier ist nichts zu sehen :/"
         empty = tk.Frame(parent, bg=Constants().BACKGROUND)
         empty.pack_propagate(False)
-        label = tk.Label(empty, text="Hier ist nichts zu sehen :/", bg=Constants().BACKGROUND)
+        label = tk.Label(empty, text=msg, bg=Constants().BACKGROUND)
         label.configure(font="Helvetica 10 italic")
         label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
         return empty
