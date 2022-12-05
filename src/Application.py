@@ -3,6 +3,7 @@ from tkinter import ttk
 import webuntis
 import src.UntisBreaks as UntisBreaks
 import src.TKUtils as TKUtils
+import idlelib.tooltip
 
 
 class Constants:
@@ -225,8 +226,9 @@ class DisplayFrame(FillerFrame):
         for i, period in enumerate(self.data[self.currentBreak]):
             frame.columnconfigure(i, weight=1)
 
-            pFrame = tk.Frame(frame, bg=Constants().C_PERIOD, width=Constants.ITEM_WIDTH, padx=40)
+            pFrame = tk.Frame(frame, bg=self.getPeriodBG(period), width=Constants.ITEM_WIDTH, padx=40)
             pFrame.config(highlightbackground="gray", highlightthickness=1)
+            self.config_tooltip(period, pFrame)
             pFrame.pack_propagate(False)
             pFrame.columnconfigure(0, weight=1)
             pFrame.rowconfigure(0, weight=1)
@@ -237,6 +239,11 @@ class DisplayFrame(FillerFrame):
             pFrame.grid(row=0, column=i, sticky=tk.NSEW)
 
 
+    def config_tooltip(self, period, widget):
+        if period.code == 'cancelled':
+            idlelib.tooltip.Hovertip(widget,'Abgesagte Stunde')
+
+
     def _add_teachers(self, parent, period):
         # gray border frame to fill space
         borderFrame = tk.Frame(parent, bg="gray", width=Constants().ITEM_WIDTH)
@@ -244,11 +251,24 @@ class DisplayFrame(FillerFrame):
         borderFrame.grid(row=0, column=0, sticky=tk.NSEW)
 
         # then frame with pad-bottom=1   => showing gray border
-        tFrame = tk.Frame(borderFrame, bg=Constants.C_PERIOD)
+        tFrame = tk.Frame(borderFrame, bg=self.getPeriodBG(period))
         tFrame.pack(fill=tk.BOTH, expand=True, side=tk.TOP, anchor=tk.NW, pady=(0,1), padx=(0,0))
         teachers_text = self._str_teachers(period)
-        tLabel = tk.Label(tFrame, text=teachers_text[:-2], bg=Constants.C_PERIOD, font=("Arial", 10))
+        tLabel = tk.Label(tFrame, text=teachers_text[:-2], font=("Arial", 10))
+        tLabel.config(fg=self.getPeriodFG(period), bg=self.getPeriodBG(period))
         tLabel.pack( side=tk.BOTTOM, pady=(10,20))
+
+
+    def getPeriodBG(self, period):
+        if period.code=='cancelled':
+            return '#ff4d4d'
+        return Constants().C_PERIOD
+
+    def getPeriodFG(self, period):
+        if period.code=='cancelled':
+            return "white"
+        return "black"
+
 
     '''
         For unknown reasons, an index error is thrown if the list is empty.
@@ -268,7 +288,7 @@ class DisplayFrame(FillerFrame):
 
 
     def _add_rooms(self, parent, period):
-        rFrame = tk.Frame(parent, bg=Constants().C_PERIOD)
+        rFrame = tk.Frame(parent, bg=self.getPeriodBG(period))
         rFrame.pack_propagate(False)
         rFrame.grid(row=1, column=0, sticky=tk.NSEW)
         room_text = ""
@@ -277,7 +297,8 @@ class DisplayFrame(FillerFrame):
         for r in period.original_rooms:
             room_text += f"({r.long_name})\n\n"
         room_text = room_text if room_text else "----"
-        rLabel = tk.Label(rFrame, text=room_text[:-2], bg=Constants.C_PERIOD, font=("Arial", 10))
+        rLabel = tk.Label(rFrame, text=room_text[:-2], font=("Arial", 10))
+        rLabel.config(bg=self.getPeriodBG(period), fg=self.getPeriodFG(period))
         rLabel.pack(side=tk.TOP, pady=(20,10))
 
 
