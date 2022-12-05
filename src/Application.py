@@ -103,6 +103,7 @@ class DisplayFrame(FillerFrame):
     def __init__(self, parent, session: webuntis.Session):
         super().__init__(parent)
         self.session = session
+        self.is_today = True
         self.data = None
         self.currentBreak = None
         self._build()
@@ -116,12 +117,18 @@ class DisplayFrame(FillerFrame):
         self.toggle_load_buttons(False)
         self._change_table(None, _fEmpty=True, _fMessage="aktualisiert Inhalte...")
         self.update()
-        self.after_init()
+        get = self.fetch_break_info if self.is_today else self.fetch_tomorrow_info
+        self.after_init(data_source=get)
 
 
     # TODO try-catch connection -> send back to login frame + Error-Popup
     def fetch_break_info(self):
         self.data = UntisBreaks.get_todays_supervisions(self.session)
+        self.currentBreak = UntisBreaks.next_break_time(self.data.keys())
+
+    
+    def fetch_tomorrow_info(self):
+        self.data = UntisBreaks.get_offset_supervisions(self.session, 1)
         self.currentBreak = UntisBreaks.next_break_time(self.data.keys())
 
     
@@ -138,11 +145,12 @@ class DisplayFrame(FillerFrame):
         self.after(10, self.after_init)
 
 
-    def after_init(self):
+    def after_init(self, data_source=None):
+        data_source = data_source if data_source else self.fetch_break_info
         self.toggle_load_buttons(False)
         def do():
             try:
-                self.fetch_break_info()
+                data_source()
                 self._change_table(self.currentBreak)
                 self.toggle_load_buttons(True)
             except webuntis.errors.NotLoggedInError:
@@ -171,7 +179,19 @@ class DisplayFrame(FillerFrame):
         self.toggle_day = tk.Button(settings_bar, text="Nächstes >>", borderwidth=0)
         self.toggle_day.config(font=("Arial", 13), bg=Constants().BACKGROUND, activeforeground="blue", activebackground=Constants.BACKGROUND)
         self.toggle_day.place(relx=0.5, rely=0.55, anchor=tk.CENTER)
+        self.toggle_day.config(command=self.toggleDay)
         return settings_bar
+
+    
+    def toggleDay(self):
+        self.toggle_load_buttons(False)
+        self._change_table(None, _fEmpty=True, _fMessage="aktualisiert Inhalte...")
+        self.is_today = not self.is_today
+        if self.is_today:
+            self.toggle_day.config(text="Nächstes >>")
+            return self.after_init(data_source=self.fetch_break_info)
+        self.toggle_day.config(text="<< Aktuelles")
+        self.after_init(data_source=self.fetch_tomorrow_info)
 
 
     def toggle_load_buttons(self, activate):
