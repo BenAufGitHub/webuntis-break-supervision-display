@@ -11,10 +11,10 @@ def _group_by_start(break_superv: list) -> dict:
     return result
 
 
-def _todays_supervisions(session: webuntis.Session) -> set:
+def _supervisions_from_day(session: webuntis.Session, offset_to_current_day) -> set:
     all_supervisions = set()
     today = datetime.datetime.today()
-    current_day = datetime.datetime(today.year,today.month,today.day)
+    current_day = datetime.datetime(today.year,today.month,today.day) + datetime.timedelta(days=offset_to_current_day)
     for teacher in session.teachers():
         break_superv = session.timetable(teacher=teacher.id, start=current_day, end=current_day).filter(type='bs')
         for bs in break_superv:
@@ -24,11 +24,20 @@ def _todays_supervisions(session: webuntis.Session) -> set:
 
 '''
 @param session: containing server, username, password, school and useragent information
+@param offset: examples: 0 => today  |  1 => tomorrow  |  -1 => yesterday
+@return dict-keys: datetime (always from current day) / dict-values: list of all break-supervisions (webuntis.objects.PeriodObject)
+'''
+def get_offset_supervisions(session: webuntis.Session, offset: int) -> dict:
+    supervisions = _supervisions_from_day(session, offset)
+    return _group_by_start(supervisions)
+
+
+'''
+@param session: containing server, username, password, school and useragent information
 @return dict-keys: datetime (always from current day) / dict-values: list of all break-supervisions (webuntis.objects.PeriodObject)
 '''
 def get_todays_supervisions(session: webuntis.Session) -> dict:
-    supervisions = _todays_supervisions(session)
-    return _group_by_start(supervisions)
+    return get_offset_supervisions(session, 0)
 
 
 '''
