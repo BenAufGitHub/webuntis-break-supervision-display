@@ -113,14 +113,10 @@ class DisplayFrame(FillerFrame):
 
 
     def reload_tables(self):
-        self.retry["state"] = "disabled"
-        def do():
-            self._change_table(None, _fEmpty=True, _fMessage="aktualisiert Inhalte...")
-            self.update()
-            self.fetch_break_info()
-            self._change_table(self.currentBreak)
-            self.retry["state"] = "normal"
-        Thread(target=do).start()
+        self.toggle_load_buttons(False)
+        self._change_table(None, _fEmpty=True, _fMessage="aktualisiert Inhalte...")
+        self.update()
+        self.after_init()
 
 
     # TODO try-catch connection -> send back to login frame + Error-Popup
@@ -143,11 +139,19 @@ class DisplayFrame(FillerFrame):
 
 
     def after_init(self):
-        self.retry["state"] = "disabled"
+        self.toggle_load_buttons(False)
         def do():
-            self.fetch_break_info()
-            self._change_table(self.currentBreak)
-            self.retry["state"] = 'normal'
+            try:
+                self.fetch_break_info()
+                self._change_table(self.currentBreak)
+                self.toggle_load_buttons(True)
+            except webuntis.errors.NotLoggedInError:
+                pass
+            except RuntimeError as e:
+                try:    # if 'winfo_exists' throws an error, then tk closed => do nothing
+                    if self.winfo_exists():
+                        raise e
+                except: pass
         Thread(target=do).start()
 
 
@@ -159,11 +163,24 @@ class DisplayFrame(FillerFrame):
 
     def _create_settings_bar(self):
         settings_bar = tk.Frame(self, bg=Constants.BACKGROUND, height=60, relief='groove', highlightthickness=2)
-        retry = tk.Button(settings_bar, text="\u27F3", padx=-1, pady=-1, font=("SherifSans", 20), borderwidth=0)
-        retry.configure(activeforeground="blue", activebackground=Constants.BACKGROUND, bg=Constants.BACKGROUND)
-        retry.configure(command=self.reload_tables)
-        retry.place(x=20, y=3)
+        self.retry = tk.Button(settings_bar, text="\u27F3", padx=-1, pady=-1, font=("SherifSans", 20), borderwidth=0)
+        self.retry.configure(activeforeground="blue", activebackground=Constants.BACKGROUND, bg=Constants.BACKGROUND)
+        self.retry.configure(command=self.reload_tables)
+        self.retry.place(x=20, y=3)
+
+        self.toggle_day = tk.Button(settings_bar, text="Nächstes >>", borderwidth=0)
+        self.toggle_day.config(font=("Arial", 13), bg=Constants().BACKGROUND, activeforeground="blue", activebackground=Constants.BACKGROUND)
+        self.toggle_day.place(relx=0.5, rely=0.55, anchor=tk.CENTER)
         return settings_bar
+
+
+    def toggle_load_buttons(self, activate):
+        if activate:
+            self.retry["state"] = 'normal'
+            self.toggle_day["state"] = 'normal'
+            return
+        self.retry["state"] = 'disabled'
+        self.toggle_day["state"] = 'disabled'
 
 
     def _create_exit_bar(self):
