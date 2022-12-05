@@ -113,10 +113,14 @@ class DisplayFrame(FillerFrame):
 
 
     def reload_tables(self):
-        self._change_table(None, _fEmpty=True, _fMessage="aktualisiert Inhalte...")
-        self.update()
-        self.fetch_break_info()
-        self._change_table(self.currentBreak)
+        self.retry["state"] = "disabled"
+        def do():
+            self._change_table(None, _fEmpty=True, _fMessage="aktualisiert Inhalte...")
+            self.update()
+            self.fetch_break_info()
+            self._change_table(self.currentBreak)
+            self.retry["state"] = "normal"
+        Thread(target=do).start()
 
 
     # TODO try-catch connection -> send back to login frame + Error-Popup
@@ -139,9 +143,11 @@ class DisplayFrame(FillerFrame):
 
 
     def after_init(self):
+        self.retry["state"] = "disabled"
         def do():
             self.fetch_break_info()
             self._change_table(self.currentBreak)
+            self.retry["state"] = 'normal'
         Thread(target=do).start()
 
 
