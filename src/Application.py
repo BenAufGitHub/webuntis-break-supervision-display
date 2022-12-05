@@ -4,6 +4,7 @@ import webuntis
 import src.UntisBreaks as UntisBreaks
 import src.TKUtils as TKUtils
 import idlelib.tooltip
+from threading import Thread
 
 
 class Constants:
@@ -129,12 +130,20 @@ class DisplayFrame(FillerFrame):
 
 
     def _build(self):
-        self.fetch_break_info()
         settings_bar = self._create_settings_bar()
-        self.table_frame = self._create_table_frame()
+        self.table_frame = self._create_table_frame(forceEmpty=(True, "läd Inhalte.."))
         exit_bar = self._create_exit_bar()
 
         self._pack_contents(settings_bar, self.table_frame, exit_bar)
+        self.after(10, self.after_init)
+
+
+    def after_init(self):
+        def do():
+            self.fetch_break_info()
+            self.fetch_break_info()
+            self._change_table(self.currentBreak)
+        Thread(target=do).start()
 
 
     def _pack_contents(self, settings_bar, table_frame, exit_bar):
