@@ -1,4 +1,5 @@
 import tkinter as tk
+from datetime import datetime
 
 
 '''
@@ -66,3 +67,33 @@ class WidthControlledScrollContainer(ScrollContainer):
         super().onCanvasConfigure(event)
         grid_width = len(self.frame.winfo_children()) * self.item_width
         self.canvas.itemconfigure(self._frame_id, width=max(grid_width, self.canvas.winfo_width()))
+
+
+
+'''
+Illustation of current day, e.g. "Sa, den 09.11."
+'''
+class DayLabel(tk.Label):
+
+    
+    def __init__(self, parent, dayObject: datetime, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+        self.month = dayObject.month
+        self.day = dayObject.day
+        self.weekday = dayObject.weekday()
+        self.set_text(self.month, self.day, self.weekday)
+
+
+    def set_text(self, month, day, weekday):
+        week_day_abbr = self.match(weekday)
+        self.config(text=f'{week_day_abbr}, den {day}.{month}.')
+
+
+    '''
+    With the respective German abbreviations.
+    '''
+    def match(self, weekday):
+        abbrs = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
+        return abbrs[weekday]
+
+    
