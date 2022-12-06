@@ -37,8 +37,13 @@ class MainFrame(tk.Tk):
             if not session: return False
             self.session = session.login()
             return True
-        except webuntis.errors.AuthError | webuntis.errors.BadCredentialsError:
+        except webuntis.errors.BadCredentialsError:
+            # TODO ModalWindow (Bad Login Data)=> Redirection to Login
             return False
+        except webuntis.errors.AuthError:
+            # TODO ModalWindow (Auth failed)=> Redirection to Login
+            return False
+
 
 
     def _logout(self):
@@ -68,7 +73,6 @@ class MainFrame(tk.Tk):
         frame.pack(anchor=tk.N, fill=tk.BOTH, expand=True, side=tk.LEFT )
 
 
-    
     def selectLoginFrame(self):
         frame = LoginFrame(parent=self)
         frame.grid(row=0, column=0)

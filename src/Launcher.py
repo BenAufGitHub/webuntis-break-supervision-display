@@ -3,5 +3,9 @@ import src.Application as App
 
 
 def launch(session: webuntis.Session=None):
-    root = App.MainFrame()
-    root.mainloop(session=session)
+    try:
+        root = App.MainFrame()
+        root.mainloop(session=session)
+    except Exception as e:
+        # TODO ModalWindow (something went wrong/see details/send info) => close
+        raise e

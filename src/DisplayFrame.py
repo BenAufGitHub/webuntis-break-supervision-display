@@ -24,17 +24,38 @@ class DisplayFrame(TKUtils.FillerFrame):
         self.winfo_toplevel().destroy()
 
 
+    '''
+    Errorhandling: Interaction with webuntis
+    '''
+    def _api_fail_save(self, callback):
+        try:
+            callback()
+        except webuntis.errors.NotLoggedInError as e:
+            # TODO ModalWindow (Session Expired/Logged Out) => Login Page
+            raise e
+        except webuntis.errors.RemoteError as e:
+            # TODO ModalWIndow (Server interaction failed) => Login Page
+            # Display Details/Send Mail Option
+            # use provided data for analysis
+            raise e
+
+
+
     # TODO try-catch connection -> send back to login frame + Error-Popup
     def fetch_break_info(self):
-        self.data = UntisBreaks.get_todays_supervisions(self.session)
-        self.currentBreak = UntisBreaks.next_break_time(self.data.keys())
+        def do():
+            self.data = UntisBreaks.get_todays_supervisions(self.session)
+            self.currentBreak = UntisBreaks.next_break_time(self.data.keys())
+        self._api_fail_save(do)
 
     
     def fetch_nextday_info(self):
+        def do():
         # for Mo-Do => Move 1, else move to Monday
-        next_day = self._get_next_day()
-        self.data = UntisBreaks.get_offset_supervisions(self.session, next_day)
-        self.currentBreak = UntisBreaks.next_break_time(self.data.keys())
+            next_day = self._get_next_day()
+            self.data = UntisBreaks.get_offset_supervisions(self.session, next_day)
+            self.currentBreak = UntisBreaks.next_break_time(self.data.keys())
+        self._api_fail_save(do)
 
 
     def _get_next_day(self):
@@ -71,7 +92,7 @@ class DisplayFrame(TKUtils.FillerFrame):
                     if self.winfo_exists():
                         raise e
                 except: pass
-        Thread(target=do).start()
+        Thread(target=lambda: self._api_fail_save(do)).start()
 
 
     def _after_init_prep(self, data_source):
@@ -196,16 +217,18 @@ class DisplayFrame(TKUtils.FillerFrame):
     '''
     def _toggle_button(self, arrow, offset):
         bg=Constants.BACKGROUND
-        if self.currentBreak:
-            rel_break = UntisBreaks.get_relative_break(self.currentBreak, self.data.keys(), offset)
-        # deactivate if necessary
-        if not (self.currentBreak and rel_break):
-            arrow["state"] = "disabled"
-            return arrow.configure(activeforeground=bg, bg=bg, activebackground=bg, foreground="gray")
-        # activate
-        arrow["state"] = "normal"
-        arrow.configure(activeforeground="blue", bg=bg, activebackground=bg, foreground="black")
-        arrow.config(command=lambda:self._change_table(rel_break))
+        def do():
+            if self.currentBreak:
+                rel_break = UntisBreaks.get_relative_break(self.currentBreak, self.data.keys(), offset)
+            # deactivate if necessary
+            if not (self.currentBreak and rel_break):
+                arrow["state"] = "disabled"
+                return arrow.configure(activeforeground=bg, bg=bg, activebackground=bg, foreground="gray")
+            # activate
+            arrow["state"] = "normal"
+            arrow.configure(activeforeground="blue", bg=bg, activebackground=bg, foreground="black")
+            arrow.config(command=lambda:self._change_table(rel_break))
+        self._api_fail_save(do)
 
     
     '''
