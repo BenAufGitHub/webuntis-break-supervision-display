@@ -137,22 +137,19 @@ class DisplayFrame(FillerFrame):
 
 
     def _build(self):
-        settings_bar = self._create_settings_bar()
+        self.settings_bar = self._create_settings_bar()
         self.table_frame = self._create_table_frame(forceEmpty=(True, "läd Inhalte.."))
         exit_bar = self._create_exit_bar()
 
-        self._pack_contents(settings_bar, self.table_frame, exit_bar)
+        self._pack_contents(self.settings_bar, self.table_frame, exit_bar)
         self.after(10, self.after_init)
 
 
     def after_init(self, data_source=None):
-        data_source = data_source if data_source else self.fetch_break_info
-        self.toggle_load_buttons(False)
+        data_source = self._after_init_prep(data_source)
         def do():
             try:
-                data_source()
-                self._change_table(self.currentBreak)
-                self.toggle_load_buttons(True)
+                self._after_init_can_fail(data_source)
             except webuntis.errors.NotLoggedInError:
                 pass
             except RuntimeError as e:
@@ -161,6 +158,18 @@ class DisplayFrame(FillerFrame):
                         raise e
                 except: pass
         Thread(target=do).start()
+
+
+    def _after_init_prep(self, data_source):
+        self.toggle_load_buttons(False)
+        if hasattr(self, 'day_label') and self.day_label: self.day_label.destroy()
+        return data_source if data_source else self.fetch_break_info
+
+    def _after_init_can_fail(self, data_source):
+        data_source()
+        self._change_table(self.currentBreak)
+        self.update_day_label()
+        self.toggle_load_buttons(True)
 
 
     def _pack_contents(self, settings_bar, table_frame, exit_bar):
@@ -201,6 +210,19 @@ class DisplayFrame(FillerFrame):
             return
         self.retry["state"] = 'disabled'
         self.toggle_day["state"] = 'disabled'
+
+    
+
+    '''
+    Spawns label with day-info on the top right in the settings bar.
+    Recalling will automatically replace the old label.
+    '''
+    def update_day_label(self):
+        if hasattr(self, 'day_label') and self.day_label: self.day_label.destroy()
+        self.day_label = TKUtils.DayLabel(self.settings_bar, self.currentBreak, borderwidth=0)
+        self.day_label.config(font=("Arial", 13), bg=Constants().BACKGROUND)
+        self.day_label.place(relx=0.95, rely=0.55, anchor=tk.E)
+
 
 
     def _create_exit_bar(self):
