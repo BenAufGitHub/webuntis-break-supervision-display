@@ -58,8 +58,8 @@ class MainFrame(tk.Tk):
         y = (screen_height-Constants.HEIGHT)/2
 
         self.title('Pausenaufsicht')
+        self.iconphoto(False, tk.PhotoImage(file='./src/appIcon.png'))
         self.geometry(f'{Constants.WIDTH}x{Constants.HEIGHT}+{int(x)}+{int(y)}')
-        # TODO icon
 
 
     def selectDisplayFrame(self, session: webuntis.Session):
