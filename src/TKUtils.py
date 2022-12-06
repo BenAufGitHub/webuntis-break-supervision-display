@@ -1,5 +1,6 @@
 import tkinter as tk
 from datetime import datetime
+from src import Constants
 
 
 '''
@@ -68,6 +69,10 @@ class WidthControlledScrollContainer(ScrollContainer):
         grid_width = len(self.frame.winfo_children()) * self.item_width
         self.canvas.itemconfigure(self._frame_id, width=max(grid_width, self.canvas.winfo_width()))
 
+
+class FillerFrame(tk.Frame):
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, **{"bg":Constants.BACKGROUND, **kwargs})
 
 
 '''
