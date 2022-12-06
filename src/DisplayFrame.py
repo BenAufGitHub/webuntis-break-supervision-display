@@ -1,6 +1,7 @@
 import idlelib.tooltip
 from threading import Thread
 import tkinter as tk
+from datetime import datetime, timedelta
 
 import webuntis
 from src import UntisBreaks, TKUtils, Constants
@@ -29,9 +30,15 @@ class DisplayFrame(TKUtils.FillerFrame):
         self.currentBreak = UntisBreaks.next_break_time(self.data.keys())
 
     
-    def fetch_tomorrow_info(self):
-        self.data = UntisBreaks.get_offset_supervisions(self.session, 1)
+    def fetch_nextday_info(self):
+        # for Mo-Do => Move 1, else move to Monday
+        next_day = self._get_next_day()
+        self.data = UntisBreaks.get_offset_supervisions(self.session, next_day)
         self.currentBreak = UntisBreaks.next_break_time(self.data.keys())
+
+
+    def _get_next_day(self):
+        return 1 if datetime.now().weekday() < 4 else 7-datetime.now().weekday()
 
 
     # ======== building =======>
@@ -105,7 +112,7 @@ class DisplayFrame(TKUtils.FillerFrame):
             self.toggle_day.config(text="Nächstes >>")
             return self.after_init(data_source=self.fetch_break_info)
         self.toggle_day.config(text="<< Aktuelles")
-        self.after_init(data_source=self.fetch_tomorrow_info)
+        self.after_init(data_source=self.fetch_nextday_info)
 
 
     def toggle_load_buttons(self, activate):
@@ -123,7 +130,8 @@ class DisplayFrame(TKUtils.FillerFrame):
     '''
     def update_day_label(self):
         if hasattr(self, 'day_label') and self.day_label: self.day_label.destroy()
-        self.day_label = TKUtils.DayLabel(self.settings_bar, self.currentBreak, borderwidth=0)
+        cb = self.currentBreak if self.currentBreak else datetime.now() if self.is_today else datetime.now()+timedelta(days=self._get_next_day())
+        self.day_label = TKUtils.DayLabel(self.settings_bar, cb, borderwidth=0)
         self.day_label.config(font=("Arial", 13), bg=Constants.BACKGROUND)
         self.day_label.place(relx=0.95, rely=0.55, anchor=tk.E)
 
@@ -153,7 +161,7 @@ class DisplayFrame(TKUtils.FillerFrame):
         self.toggle_load_buttons(False)
         self._change_table(None, _fEmpty=True, _fMessage="aktualisiert Inhalte...")
         self.update()
-        get = self.fetch_break_info if self.is_today else self.fetch_tomorrow_info
+        get = self.fetch_break_info if self.is_today else self.fetch_nextday_info
         self.after_init(data_source=get)
 
 
