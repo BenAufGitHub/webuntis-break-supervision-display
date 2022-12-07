@@ -1,6 +1,9 @@
 import tkinter as tk
 from datetime import datetime
 from src import Constants
+from tkinter.messagebox import showerror
+import traceback, sys
+import pyperclip
 
 
 '''
@@ -102,3 +105,25 @@ class DayLabel(tk.Label):
         return abbrs[weekday]
 
     
+
+class TKErrorHandler:
+
+    def report_callback_exception(self, exc, val, tb):
+        instructions = '''Vorgehen bei weiteren Problemen:\n1. Das Traceback per Mail an "bmette.api@gmail.com"\noder\n2. Issue an 
+"https://github.com/BenAufGitHub/webuntis-break-supervision-display/issues" schreiben.'''
+        msg = f'Fehler:\n{val}\n\n{instructions}\n\nTraceback:\nvom Typ {exc},\nTraceback wurde automatisch kopiert.'
+        TKErrorHandler._copy(exc, val, tb)
+        showerror("Error", message=msg)
+
+    def _copy(exc, val, tb):
+        msg = TKErrorHandler._prepare_clipboard_msg(exc, val, tb)
+        if sys.stderr: sys.stderr.write(msg)
+        pyperclip.copy(msg)
+
+
+    def _prepare_clipboard_msg(exc, val, tb):
+        lines = traceback.format_tb(tb)
+        tb_result = lines.pop(0)
+        for line in lines:
+            tb_result += "\n"+line
+        return f'{exc}\n{val}\nTraceback (webuntis-bs):\n{tb_result}'

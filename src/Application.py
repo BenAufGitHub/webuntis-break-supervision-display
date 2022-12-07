@@ -4,6 +4,12 @@ import webuntis
 from src import DisplayFrame, Constants, TKUtils
 
 
+
+def handle_callback_errors():
+    tk.Tk.report_callback_exception = TKUtils.TKErrorHandler.report_callback_exception
+
+
+
 class MainFrame(tk.Tk):
 
     # ================ public ================
@@ -11,6 +17,7 @@ class MainFrame(tk.Tk):
 
     def __init__(self):
         super().__init__()
+        handle_callback_errors()
         self.configure_variables()
         self.session = None
 
