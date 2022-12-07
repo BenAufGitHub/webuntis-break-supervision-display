@@ -42,6 +42,13 @@ class DisplayFrame(TKUtils.FillerFrame):
             raise e
 
 
+    def _threaded_fail_save(self, callback):
+        try:
+            callback()
+        except Exception as e:
+            TKUtils.TKErrorHandler.report_callback_exception(self, e.__class__.__name__, str(e), e.__traceback__)
+
+
 
     # TODO try-catch connection -> send back to login frame + Error-Popup
     '''
@@ -99,7 +106,7 @@ class DisplayFrame(TKUtils.FillerFrame):
                     if self.winfo_exists():
                         raise e
                 except: pass
-        Thread(target=lambda: self._api_fail_save(do)).start()
+        Thread(target=lambda: self._threaded_fail_save(do)).start()
 
 
     def _after_init_prep(self, data_source):

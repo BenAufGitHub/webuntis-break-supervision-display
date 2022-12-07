@@ -108,12 +108,14 @@ class DayLabel(tk.Label):
 
 class TKErrorHandler:
 
-    def report_callback_exception(self, exc, val, tb):
+
+    def report_callback_exception(caller, exc, val, tb):
         instructions = '''Vorgehen bei weiteren Problemen:\n1. Das Traceback per Mail an "bmette.api@gmail.com"\noder\n2. Issue an 
 "https://github.com/BenAufGitHub/webuntis-break-supervision-display/issues" schreiben.'''
         msg = f'Fehler:\n{val}\n\n{instructions}\n\nTraceback:\nvom Typ {exc},\nTraceback wurde automatisch kopiert.'
         TKErrorHandler._copy(exc, val, tb)
         showerror("Error", message=msg)
+
 
     def _copy(exc, val, tb):
         msg = TKErrorHandler._prepare_clipboard_msg(exc, val, tb)
