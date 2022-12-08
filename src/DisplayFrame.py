@@ -19,6 +19,7 @@ class DisplayFrame(TKUtils.FillerFrame):
         self.currentBreak = None
         # For pretending to have a different day, otherwise should be 0.
         self.natural_offset = 0
+        self.break_offset_hours = 0
         self._build()
 
 
@@ -57,7 +58,7 @@ class DisplayFrame(TKUtils.FillerFrame):
     def fetch_break_info(self):
         def do():
             self.data = UntisBreaks.get_offset_supervisions(self.session, self.natural_offset)
-            current_time = datetime.now()+timedelta(days=self.natural_offset)
+            current_time = datetime.now()+timedelta(days=self.natural_offset, hours=self.break_offset_hours)
             self.currentBreak = UntisBreaks.next_break_time(self.data.keys(), current=current_time)
         self._api_fail_save(do)
 
