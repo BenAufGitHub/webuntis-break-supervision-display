@@ -3,6 +3,7 @@ from tkinter import ttk
 from threading import Thread
 import webuntis
 from src import DisplayFrame, Constants, TKUtils
+from tkinter.messagebox import showerror
 
 
 
@@ -46,11 +47,13 @@ class MainFrame(tk.Tk):
             self.session = session.login()
             return True
         except webuntis.errors.BadCredentialsError:
-            # TODO ModalWindow (Bad Login Data)=> Redirection to Login
+            showerror("Login Fehlgeschlagen", message="Eingabedaten sind nicht korrekt.")
             return False
         except webuntis.errors.AuthError:
-            # TODO ModalWindow (Auth failed)=> Redirection to Login
+            showerror("Login Fehlgeschlagen", message="Authentifizierung fehlgeschlagen.")
             return False
+        except:
+            showerror("Fehler", message="Ein unerwarteter Fehler ist aufgetreten.")
 
 
 
