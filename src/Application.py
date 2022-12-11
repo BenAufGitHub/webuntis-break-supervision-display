@@ -75,15 +75,17 @@ class MainFrame(tk.Tk):
 
 
     def selectDisplayFrame(self, session: webuntis.Session):
-        frame = DisplayFrame.DisplayFrame(parent=self, session=session)
-        frame.grid(row=0, column=0) 
-        frame.pack(anchor=tk.N, fill=tk.BOTH, expand=True, side=tk.LEFT )
+        if self.content: self.content.destroy()
+        self.content = DisplayFrame.DisplayFrame(parent=self, session=session)
+        self.content.grid(row=0, column=0) 
+        self.content.pack(anchor=tk.N, fill=tk.BOTH, expand=True, side=tk.LEFT )
 
 
     def selectLoginFrame(self):
-        frame = LoginFrame(parent=self)
-        frame.grid(row=0, column=0)
-        frame.pack(anchor=tk.N, fill=tk.BOTH, expand=True, side=tk.LEFT )
+        if hasattr(self, 'content') and self.content: self.content.destroy()
+        self.content = LoginFrame(parent=self)
+        self.content.grid(row=0, column=0)
+        self.content.pack(anchor=tk.N, fill=tk.BOTH, expand=True, side=tk.LEFT )
 
 
 
