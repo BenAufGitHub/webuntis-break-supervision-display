@@ -99,14 +99,17 @@ class LoginFrame(TKUtils.FillerFrame):
 
 
     def adjust_win_size(self, root):
-        pass # TODO
+        mid_x = self.winfo_screenwidth() / 2
+        mid_y = self.winfo_screenheight() / 2
+        root.geometry(f'270x420+{int(mid_x)-135}+{int(mid_y)-210}')
+
 
 
     def _build(self):
         self.login_panel = self._create_login_panel()
-        self.login_panel.place(x=16, y=16)
+        self.login_panel.place(x=20, y=16)
         self.submit = self._create_submit_button()
-        self.submit.place(x=110, y=380)
+        self.submit.place(x=113, y=378)
 
 
     def _create_submit_button(self):
