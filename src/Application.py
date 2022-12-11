@@ -130,7 +130,8 @@ class LoginFrame(TKUtils.FillerFrame):
     def _createUserEntry(self, parent):
         user = TKUtils.FillerFrame(parent)
         label = tk.Label(user, text="Benutzer:", pady=4, padx=4, bg=Constants.BACKGROUND, font=("Arial", 11))
-        self.user_entry = tk.Entry(user, width=25, font=("Arial", 11), borderwidth=6, relief=tk.FLAT)
+        self.user_entry = tk.Entry(user)
+        self._base_entry_config(self.user_entry)
 
         self._entry_grid_configure(user, label, self.user_entry)
         return user
@@ -139,7 +140,8 @@ class LoginFrame(TKUtils.FillerFrame):
     def _createPasswordEntry(self, parent):
         password = TKUtils.FillerFrame(parent)
         label = tk.Label(password, text="Password:", pady=4, padx=4, bg=Constants.BACKGROUND, font=("Arial", 11))
-        self.pw_entry = tk.Entry(password, width=25, font=("Arial", 11), borderwidth=6, relief=tk.FLAT)
+        self.pw_entry = tk.Entry(password, show="*")
+        self._base_entry_config(self.pw_entry)
 
         self._entry_grid_configure(password, label, self.pw_entry)
         return password
@@ -148,7 +150,8 @@ class LoginFrame(TKUtils.FillerFrame):
     def _createSchoolEntry(self, parent):
         school = TKUtils.FillerFrame(parent)
         label = tk.Label(school, text="Schule:", pady=4, padx=4, bg=Constants.BACKGROUND, font=("Arial", 11))
-        self.school_entry = tk.Entry(school, width=25, font=("Arial", 11), borderwidth=6, relief=tk.FLAT)
+        self.school_entry = tk.Entry(school)
+        self._base_entry_config(self.school_entry)
 
         self._entry_grid_configure(school, label, self.school_entry)
         return school
@@ -157,10 +160,15 @@ class LoginFrame(TKUtils.FillerFrame):
     def _createServerEntry(self, parent):
         server = TKUtils.FillerFrame(parent)
         label = tk.Label(server, text="Server:", pady=4, padx=4, bg=Constants.BACKGROUND, font=("Arial", 11))
-        self.server_entry = tk.Entry(server, width=25, font=("Arial", 11), borderwidth=6, relief=tk.FLAT)
+        self.server_entry = tk.Entry(server)
+        self._base_entry_config(self.server_entry)
 
         self._entry_grid_configure(server, label, self.server_entry)
         return server
+
+
+    def _base_entry_config(self, entry):
+        entry.config(width=25, font=("Arial", 11), borderwidth=6, relief=tk.FLAT)
 
     
     def _entry_grid_configure(self, grid_parent, label, entry):
