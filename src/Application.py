@@ -70,19 +70,21 @@ class MainFrame(tk.Tk):
         x = (screen_width-Constants.WIDTH)/2
         y = (screen_height-Constants.HEIGHT)/2
 
-        self.title('Pausenaufsicht')
+        self.title('Pausenaufsichten')
         self.iconphoto(False, tk.PhotoImage(file='./src/appIcon.png'))
         self.geometry(f'{Constants.WIDTH}x{Constants.HEIGHT}+{int(x)}+{int(y)}')
 
 
     def selectDisplayFrame(self, session: webuntis.Session):
         if self.content: self.content.destroy()
+        self.configure_variables()
         self.content = DisplayFrame.DisplayFrame(parent=self, session=session)
         self.content.grid(row=0, column=0) 
         self.content.pack(anchor=tk.N, fill=tk.BOTH, expand=True, side=tk.LEFT )
 
 
     def selectLoginFrame(self):
+        self.title('Webuntis Login - Pausenaufsicht')
         if hasattr(self, 'content') and self.content: self.content.destroy()
         self.content = LoginFrame(parent=self)
         self.content.grid(row=0, column=0)
