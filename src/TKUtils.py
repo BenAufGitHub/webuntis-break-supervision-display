@@ -114,7 +114,7 @@ class TKErrorHandler:
 "https://github.com/BenAufGitHub/webuntis-break-supervision-display/issues" schreiben.'''
         msg = f'Fehler:\n{val}\n\n{instructions}\n\nTraceback:\nvom Typ {exc},\nTraceback wurde automatisch kopiert.'
         TKErrorHandler._copy(exc, val, tb)
-        showerror("Error", message=msg)
+        showerror("Fehler", message=msg)
 
 
     def _copy(exc, val, tb):
