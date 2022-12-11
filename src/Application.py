@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from threading import Thread
 import webuntis
 from src import DisplayFrame, Constants, TKUtils
 
@@ -98,9 +99,60 @@ class LoginFrame(TKUtils.FillerFrame):
         super().__init__(parent, *args, **kwargs)
         self.adjust_win_size(parent)
         self._build()
+        self._bind_enter()
+        self._set_focus()
 
 
-    def adjust_win_size(self, root):
+    def try_login(self):
+        self.submit["state"] = "disabled"
+        user = self.user_entry.get()
+        pw = self.pw_entry.get()
+        school = self.school_entry.get()
+        server = self.server_entry.get()
+        Thread(target=lambda:self._login(user, pw, school, server)).start()
+
+    
+    def _login(self, user, pw, school, server):
+        try:
+            session = webuntis.Session(server=server, username=user, password=pw, school=school, useragent='Pausenaufsichtenanzeiger')
+            session.login()
+            Thread(target=lambda: self._finish_login(session)).start()
+        except webuntis.errors.BadCredentialsError:
+            self._report("Zugangsdaten sind nicht korrekt.")
+        except webuntis.errors.AuthError:
+            self._report("Authentifizierung fehlgeschlagen.")
+        except ValueError:
+            self.submit["state"] = "normal"
+        except Exception:
+            self._report("Es konnte keine Verbindung aufgebaut werden.")
+
+    
+    def _finish_login(self, session):
+        try:
+            self.winfo_toplevel().selectDisplayFrame(session)
+        except Exception as e:
+            TKUtils.TKErrorHandler.report_callback_exception(self, e.__class__.__name__, str(e), e.__traceback__)
+
+    
+    def _report(self, msg):
+        self.login_panel.place_forget()
+        self.warning = TKUtils.FillerFrame(self, width=230, height=350, highlightthickness=1, highlightbackground="white")
+        self.warning.pack_propagate(False)
+        wrapper = TKUtils.FillerFrame(self.warning)
+        tk.Label(wrapper, text=msg, background=Constants.BACKGROUND, fg="red", wraplength=200, pady=10).pack()
+        tk.Button(wrapper, text="Zurück", command=self._show_login).pack()
+        wrapper.place(relx=.5, rely=.5, anchor=tk.CENTER)
+        self.warning.place(x=20, y=16)
+
+    
+    def _show_login(self):
+        self.submit["state"] = "normal"
+        self.warning.destroy()
+        self.login_panel.place(x=20, y=16)
+        
+
+
+    def adjust_win_size(self, root: tk.Tk):
         mid_x = self.winfo_screenwidth() / 2
         mid_y = self.winfo_screenheight() / 2
         root.geometry(f'270x420+{int(mid_x)-135}+{int(mid_y)-210}')
@@ -115,7 +167,7 @@ class LoginFrame(TKUtils.FillerFrame):
 
 
     def _create_submit_button(self):
-        button = tk.Button(self, text="Log In")
+        button = tk.Button(self, text="Log In", command=self.try_login)
         return button
 
 
@@ -190,3 +242,14 @@ class LoginFrame(TKUtils.FillerFrame):
 
         label.grid(row=0, column=0, sticky=tk.W)
         entry.grid(row=1, column=0, sticky=tk.NSEW, padx=4)
+
+    
+    def _bind_enter(self):
+        self.user_entry.bind('<Return>', lambda x: self.pw_entry.focus())
+        self.pw_entry.bind('<Return>', lambda x: self.school_entry.focus())
+        self.school_entry.bind('<Return>', lambda x: self.server_entry.focus())
+        self.server_entry.bind('<Return>', lambda x: self.submit.invoke())
+
+    
+    def _set_focus(self):
+        self.user_entry.focus()
