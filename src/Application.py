@@ -104,7 +104,14 @@ class LoginFrame(TKUtils.FillerFrame):
 
     def _build(self):
         self.login_panel = self._create_login_panel()
-        self.login_panel.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        self.login_panel.place(x=16, y=16)
+        self.submit = self._create_submit_button()
+        self.submit.place(x=110, y=380)
+
+
+    def _create_submit_button(self):
+        button = tk.Button(self, text="Log In")
+        return button
 
 
     def _create_login_panel(self):
