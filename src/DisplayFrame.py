@@ -20,7 +20,7 @@ class DisplayFrame(TKUtils.FillerFrame):
         # For pretending to have a different day, otherwise should be 0.
         self.natural_offset = 0
         self.break_offset_hours = 0
-        self._build()
+        self._build(parent)
 
 
     def finishMainloop(self):
@@ -80,10 +80,10 @@ class DisplayFrame(TKUtils.FillerFrame):
     # ======== building =======>
 
 
-    def _build(self):
+    def _build(self, root):
         self.settings_bar = self._create_settings_bar()
         self.table_frame = self._create_table_frame(forceEmpty=(True, "läd Inhalte.."))
-        exit_bar = self._create_exit_bar()
+        exit_bar = self._create_exit_bar(root)
 
         self._pack_contents(self.settings_bar, self.table_frame, exit_bar)
         self.after(10, self.after_init)
@@ -185,9 +185,9 @@ class DisplayFrame(TKUtils.FillerFrame):
     # ======= exit bar =======>
 
 
-    def _create_exit_bar(self):
+    def _create_exit_bar(self, root):
         exit_bar = tk.Frame(self, bg=Constants.BACKGROUND, height=80, relief='groove', highlightthickness=2)
-        b1 = tk.Button(exit_bar, padx=5, text="Log Out")
+        b1 = tk.Button(exit_bar, padx=5, text="Log Out", command=root.selectLoginFrame)
         b2 = tk.Button(exit_bar, padx=5, text="Beenden", command=self.finishMainloop)
         b1.place(relx=0.45, rely=0.5, anchor=tk.E)
         b2.place(relx=0.55, rely=0.5, anchor=tk.W)
