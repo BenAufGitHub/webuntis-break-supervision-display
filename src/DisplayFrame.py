@@ -2,6 +2,7 @@ import idlelib.tooltip
 from threading import Thread
 import tkinter as tk
 from datetime import datetime, timedelta
+from tkinter.messagebox import showerror
 
 import webuntis
 from src import UntisBreaks, TKUtils, Constants
@@ -20,7 +21,7 @@ class DisplayFrame(TKUtils.FillerFrame):
         # For pretending to have a different day, otherwise should be 0.
         self.natural_offset = 0
         self.break_offset_hours = 0
-        self._build(parent)
+        self._build()
 
 
     def finishMainloop(self):
@@ -33,14 +34,16 @@ class DisplayFrame(TKUtils.FillerFrame):
     def _api_fail_save(self, callback):
         try:
             callback()
-        except webuntis.errors.NotLoggedInError as e:
-            # TODO ModalWindow (Session Expired/Logged Out) => Login Page
-            raise e
-        except webuntis.errors.RemoteError as e:
-            # TODO ModalWIndow (Server interaction failed) => Login Page
-            # Display Details/Send Mail Option
-            # use provided data for analysis
-            raise e
+        except webuntis.errors.NotLoggedInError:
+            showerror("Verbindung abgelaufen", message="Sitzung ist abgelaufen. Melden Sie sich erneut an.")
+            self.winfo_toplevel().selectLoginFrame()
+        except webuntis.errors.Error:
+            showerror("Server Fehler", message="Ein Fehler während der Kommunikation mit Webuntis ist aufgetreten.")
+            self.winfo_toplevel().selectLoginFrame()
+        except OSError:
+            showerror("Verbindung verloren", message="Die Verbindung zum Server wurde verloren.")
+
+        
 
 
     def _threaded_fail_save(self, callback):
@@ -80,10 +83,10 @@ class DisplayFrame(TKUtils.FillerFrame):
     # ======== building =======>
 
 
-    def _build(self, root):
+    def _build(self):
         self.settings_bar = self._create_settings_bar()
         self.table_frame = self._create_table_frame(forceEmpty=(True, "läd Inhalte.."))
-        exit_bar = self._create_exit_bar(root)
+        exit_bar = self._create_exit_bar()
 
         self._pack_contents(self.settings_bar, self.table_frame, exit_bar)
         self.after(10, self.after_init)
@@ -101,11 +104,12 @@ class DisplayFrame(TKUtils.FillerFrame):
             try:
                 self._after_init_can_fail(data_source)
             except webuntis.errors.NotLoggedInError:
-                pass    # means that user has already logged out
+                showerror("Verbindung abgelaufen", message="Sitzung ist abgelaufen. Melden Sie sich erneut an.")
+                self.winfo_toplevel().selectLoginFrame()
             except RuntimeError as e:
                 try:    # if 'winfo_exists' throws an error, then tk closed => do nothing
                     if self.winfo_exists():
-                        raise e
+                        TKUtils.TKErrorHandler.report_callback_exception(self, e.__class__.__name__, str(e), e.__traceback__)
                 except: pass
         Thread(target=lambda: self._threaded_fail_save(do)).start()
 
@@ -185,9 +189,9 @@ class DisplayFrame(TKUtils.FillerFrame):
     # ======= exit bar =======>
 
 
-    def _create_exit_bar(self, root):
+    def _create_exit_bar(self):
         exit_bar = tk.Frame(self, bg=Constants.BACKGROUND, height=80, relief='groove', highlightthickness=2)
-        b1 = tk.Button(exit_bar, padx=5, text="Log Out", command=root.selectLoginFrame)
+        b1 = tk.Button(exit_bar, padx=5, text="Log Out", command=self.winfo_toplevel().selectLoginFrame)
         b2 = tk.Button(exit_bar, padx=5, text="Beenden", command=self.finishMainloop)
         b1.place(relx=0.45, rely=0.5, anchor=tk.E)
         b2.place(relx=0.55, rely=0.5, anchor=tk.W)
