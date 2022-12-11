@@ -116,7 +116,7 @@ class LoginFrame(TKUtils.FillerFrame):
     
     def _login(self, user, pw, school, server):
         try:
-            session = webuntis.Session(server=server, username=user, password=pw, school=school, useragent='Pausenaufsichtenanzeiger')
+            session = webuntis.Session(server=server, username=user, password=pw, school=school, useragent=Constants.USER_AGENT)
             session.login()
             Thread(target=lambda: self._finish_login(session)).start()
         except webuntis.errors.BadCredentialsError:
