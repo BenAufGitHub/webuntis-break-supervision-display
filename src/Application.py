@@ -76,7 +76,7 @@ class MainFrame(tk.Tk):
 
 
     def selectDisplayFrame(self, session: webuntis.Session):
-        if self.content: self.content.destroy()
+        if hasattr(self, 'content') and self.content: self.content.destroy()
         self.configure_variables()
         self.content = DisplayFrame.DisplayFrame(parent=self, session=session)
         self.content.grid(row=0, column=0) 
