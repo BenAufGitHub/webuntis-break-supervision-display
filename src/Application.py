@@ -1,15 +1,26 @@
-import tkinter as tk
-from tkinter import ttk
-from threading import Thread
-import webuntis
-from src import DisplayFrame, Constants, TKUtils
-from tkinter.messagebox import showerror
 import sys, os
+import pickle
+from threading import Thread
+
+import tkinter as tk
+from tkinter.messagebox import showerror
+
+from src import DisplayFrame, Constants, TKUtils
+import webuntis
 
 
 
 def handle_callback_errors():
     tk.Tk.report_callback_exception = TKUtils.TKErrorHandler.report_callback_exception
+
+
+def resource_path(relative_path):
+    try:
+        # using temp file if compiling to exe
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath("./resources/")
+    return os.path.join(base_path, relative_path)
 
 
 
@@ -75,17 +86,8 @@ class MainFrame(tk.Tk):
         y = (screen_height-Constants.HEIGHT)/2
 
         self.title('Pausenaufsichten')
-        self.iconphoto(False, tk.PhotoImage(file=self.resource_path('appIcon.png')))
+        self.iconphoto(False, tk.PhotoImage(file=resource_path('appIcon.png')))
         self.geometry(f'{Constants.WIDTH}x{Constants.HEIGHT}+{int(x)}+{int(y)}')
-
-
-    def resource_path(self, relative_path):
-        try:
-            # using temp file if compiling to exe
-            base_path = sys._MEIPASS
-        except Exception:
-            base_path = os.path.abspath("./resources/")
-        return os.path.join(base_path, relative_path)
 
 
     def selectDisplayFrame(self, session: webuntis.Session):
@@ -114,6 +116,7 @@ class LoginFrame(TKUtils.FillerFrame):
         super().__init__(parent, *args, **kwargs)
         self.adjust_win_size(parent)
         self._build()
+        self._substitute()
         self._bind_enter()
         self._set_focus()
 
@@ -131,7 +134,7 @@ class LoginFrame(TKUtils.FillerFrame):
         try:
             session = webuntis.Session(server=server, username=user, password=pw, school=school, useragent=Constants.USER_AGENT)
             session.login()
-            Thread(target=lambda: self._finish_login(session)).start()
+            Thread(target=lambda: self._finish_login(session, school, server)).start()
         except webuntis.errors.BadCredentialsError:
             self._report("Zugangsdaten sind nicht korrekt.")
         except webuntis.errors.AuthError:
@@ -142,8 +145,9 @@ class LoginFrame(TKUtils.FillerFrame):
             self._report("Es konnte keine Verbindung aufgebaut werden.")
 
     
-    def _finish_login(self, session):
+    def _finish_login(self, session, school, server):
         try:
+            self._save_cache(school, server)
             self.winfo_toplevel().selectDisplayFrame(session)
         except Exception as e:
             TKUtils.TKErrorHandler.report_callback_exception(self, e.__class__.__name__, str(e), e.__traceback__)
@@ -268,3 +272,24 @@ class LoginFrame(TKUtils.FillerFrame):
     
     def _set_focus(self):
         self.user_entry.focus()
+
+
+    '''
+    pre-add saved data from registration
+    '''
+    def _substitute(self):
+        try:
+            with open(resource_path(Constants.CACHE), 'rb') as file:
+                data = pickle.load(file)
+            if data["school"] and data["server"]:
+                self.school_entry.insert(0, data["school"])
+                self.server_entry.insert(0, data["server"])
+        except FileNotFoundError:
+            self._save_cache(None, None)
+
+
+    def _save_cache(self, school, server):
+        data = {"school": school, "server": server}
+        serialized = pickle.dumps(data)
+        with open(resource_path(Constants.CACHE), 'wb') as file:
+            file.write(serialized)
