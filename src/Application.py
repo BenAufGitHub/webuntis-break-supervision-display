@@ -4,6 +4,7 @@ from threading import Thread
 import webuntis
 from src import DisplayFrame, Constants, TKUtils
 from tkinter.messagebox import showerror
+import sys, os
 
 
 
@@ -74,8 +75,17 @@ class MainFrame(tk.Tk):
         y = (screen_height-Constants.HEIGHT)/2
 
         self.title('Pausenaufsichten')
-        self.iconphoto(False, tk.PhotoImage(file='./src/appIcon.png'))
+        self.iconphoto(False, tk.PhotoImage(file=self.resource_path('appIcon.png')))
         self.geometry(f'{Constants.WIDTH}x{Constants.HEIGHT}+{int(x)}+{int(y)}')
+
+
+    def resource_path(self, relative_path):
+        try:
+            # using temp file if compiling to exe
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath("./resources/")
+        return os.path.join(base_path, relative_path)
 
 
     def selectDisplayFrame(self, session: webuntis.Session):

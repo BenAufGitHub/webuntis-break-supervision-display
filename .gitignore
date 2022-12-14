@@ -5,4 +5,5 @@
 !READ.ME
 
 !/src/**
+!/resources/appIcon.png
 src/__pycache__/**
