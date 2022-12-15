@@ -5,4 +5,4 @@ BACKGROUND="#93B5E1"
 C_PERIOD="lightblue"
 ITEM_WIDTH=200
 USER_AGENT="Pausenaufsichtenanzeiger"
-CACHE="cache.cfg"
+CACHE="config.ini"

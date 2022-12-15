@@ -1,6 +1,6 @@
 import sys, os
-import pickle
 from threading import Thread
+from configparser import ConfigParser
 
 import tkinter as tk
 from tkinter.messagebox import showerror
@@ -30,9 +30,27 @@ def environ_path(relative_path):
     return f'{directory}\\{relative_path}'
 
 
-def environ_configured(relative_path) -> bool:
-    user_config= environ_path(relative_path)
-    return os.path.exists(user_config) and os.path.isfile(user_config)
+'''
+Important note: Although the user can manually save userdata under '.\\{username}\\.webuntis-breaks\\config.ini',
+this is not recommended since the password will be very accessible for other people.
+Only school and server info will be saved automatically be this program.
+'''
+def environ_configure(relative_path) -> bool:
+    user_config = environ_path(relative_path)
+    if not os.path.isfile(user_config):
+        init_config(user_config)
+
+
+def init_config(path):
+    cfg = ConfigParser()
+    cfg['login'] = {
+        "username": "",
+        "password": "",
+        "school": "",
+        "server": "herakles.webuntis.com"
+    }
+    with open(path, 'w') as file:
+        cfg.write(file)
 
 
 
@@ -128,7 +146,7 @@ class LoginFrame(TKUtils.FillerFrame):
         super().__init__(parent, *args, **kwargs)
         self.adjust_win_size(parent)
         self._build()
-        self._substitute()
+        self._substitute_login()
         self._bind_enter()
         self._set_focus()
 
@@ -159,7 +177,7 @@ class LoginFrame(TKUtils.FillerFrame):
     
     def _finish_login(self, session, school, server):
         try:
-            self._save_cache(school, server)
+            self._save_login(school, server)
             self.winfo_toplevel().selectDisplayFrame(session)
         except Exception as e:
             TKUtils.TKErrorHandler.report_callback_exception(self, e.__class__.__name__, str(e), e.__traceback__)
@@ -289,20 +307,30 @@ class LoginFrame(TKUtils.FillerFrame):
     '''
     pre-add saved data from registration
     '''
-    def _substitute(self):
-        if not environ_configured(Constants.CACHE):
-            return self._save_cache(None, None)
+    def _substitute_login(self):
+        environ_configure(Constants.CACHE)
+        cfg = ConfigParser()
+        cfg.read(environ_path(Constants.CACHE))
 
-        with open(environ_path(Constants.CACHE), 'rb') as file:
-            data = pickle.load(file)
-            
-        if data["school"] and data["server"]:
-            self.school_entry.insert(0, data["school"])
-            self.server_entry.insert(0, data["server"])
+        user = cfg.get("login", "username")
+        pw = cfg.get("login", "password")
+        school = cfg.get("login", "school")
+        server = cfg.get("login", "server")
+
+        if user: self.user_entry.insert(0, user)
+        if pw: self.pw_entry.insert(0, pw)
+        if school: self.school_entry.insert(0, school)
+        if server: self.server_entry.insert(0, server)
 
 
-    def _save_cache(self, school, server):
-        data = {"school": school, "server": server}
-        serialized = pickle.dumps(data)
-        with open(environ_path(Constants.CACHE), 'wb') as file:
-            file.write(serialized)
+    '''
+    Password and username ARE NOT automatically saved by the programm.
+    '''
+    def _save_login(self, school, server):
+        environ_configure(Constants.CACHE)
+        cfg = ConfigParser()
+        cfg.read(environ_path(Constants.CACHE))
+        cfg.set("login", "school", school)
+        cfg.set("login", "server", server)
+        with open(environ_path(Constants.CACHE), 'w') as file:
+            cfg.write(file)
