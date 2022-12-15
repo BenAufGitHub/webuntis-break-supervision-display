@@ -45,7 +45,7 @@
     Autor: Ben Mette
     E-Mail: bmette.api@gmail.com
     Version: 1.0.0
-    Funktion: aasy access to break supervisions in WebUntis
+    Funktion: easy access to break supervisions in WebUntis
 
 
 ## Required Modules:
