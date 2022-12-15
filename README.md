@@ -32,7 +32,10 @@
 
 ### Umwandlung zu .exe:
     1. pip install pyinstaller
+    Windows
     2. führe 'pyinstaller --onefile --windowed --add-data "resources\appIcon.png;." .\main.py' im Ordner aus
+    IOS
+    2. führe 'pyinstaller --onefile --windowed --add-data "resources\appIcon.png:." .\main.py' im Ordner aus
 
 
 
@@ -68,7 +71,10 @@
 
 ### Bundling to .exe:
     1. pip install pyinstaller
+    Windows
     2. run 'pyinstaller --onefile --windowed --add-data "resources\appIcon.png;." .\main.py' in the directory
+    IOS
+    2. run 'pyinstaller --onefile --windowed --add-data "resources\appIcon.png:." .\main.py' in the directory
 
 
 
