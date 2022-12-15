@@ -23,6 +23,18 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
+def environ_path(relative_path):
+    directory = os.environ.get('USERPROFILE') + '\\.webuntis-breaks'
+    if not os.path.exists(directory):
+        os.mkdir(directory)
+    return f'{directory}\\{relative_path}'
+
+
+def environ_configured(relative_path) -> bool:
+    user_config= environ_path(relative_path)
+    return os.path.exists(user_config) and os.path.isfile(user_config)
+
+
 
 class MainFrame(tk.Tk):
 
@@ -278,18 +290,19 @@ class LoginFrame(TKUtils.FillerFrame):
     pre-add saved data from registration
     '''
     def _substitute(self):
-        try:
-            with open(resource_path(Constants.CACHE), 'rb') as file:
-                data = pickle.load(file)
-            if data["school"] and data["server"]:
-                self.school_entry.insert(0, data["school"])
-                self.server_entry.insert(0, data["server"])
-        except FileNotFoundError:
-            self._save_cache(None, None)
+        if not environ_configured(Constants.CACHE):
+            return self._save_cache(None, None)
+
+        with open(environ_path(Constants.CACHE), 'rb') as file:
+            data = pickle.load(file)
+            
+        if data["school"] and data["server"]:
+            self.school_entry.insert(0, data["school"])
+            self.server_entry.insert(0, data["server"])
 
 
     def _save_cache(self, school, server):
         data = {"school": school, "server": server}
         serialized = pickle.dumps(data)
-        with open(resource_path(Constants.CACHE), 'wb') as file:
+        with open(environ_path(Constants.CACHE), 'wb') as file:
             file.write(serialized)
