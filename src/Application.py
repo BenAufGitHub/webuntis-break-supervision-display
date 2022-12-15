@@ -31,7 +31,7 @@ def environ_path(relative_path):
 
 
 '''
-Important note: Although the user can manually save userdata under '.\\{username}\\.webuntis-breaks\\config.ini',
+Important note: Although the user can manually save userdata under '{username}\\.webuntis-breaks\\config.ini',
 this is not recommended since the password will be very accessible for other people.
 Only school and server info will be saved automatically be this program.
 '''
