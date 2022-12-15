@@ -2,7 +2,7 @@
 !*/
 
 !.gitignore
-!READ.ME
+!README.md
 
 !/src/**
 !/resources/appIcon.png
