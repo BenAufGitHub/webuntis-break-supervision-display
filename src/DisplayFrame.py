@@ -121,10 +121,18 @@ class DisplayFrame(TKUtils.FillerFrame):
 
 
     def _after_init_can_fail(self, data_source):
-        data_source()
-        self._change_table(self.currentBreak)
-        self.update_day_label()
-        self.toggle_load_buttons(True)
+        try:
+            data_source()
+            self._change_table(self.currentBreak)
+            self.update_day_label()
+            self.toggle_load_buttons(True)
+        except Exception as e: 
+            try:
+                # throws error if frame is destroyed => sucks up error
+                if self.winfo_exists():
+                    raise e
+            except: pass
+
 
 
     # ====== settings bar ======>
