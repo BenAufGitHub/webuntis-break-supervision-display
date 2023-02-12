@@ -75,6 +75,10 @@
     2. run 'pyinstaller --onefile --windowed --add-data "resources\appIcon.png;." .\main.py' in the directory
     IOS
     2. run 'pyinstaller --onefile --windowed --add-data "resources\appIcon.png:." .\main.py' in the directory
+   
+## LICENSE NOTICE
+    License information is convered in 'LICENSE.txt'.
+    Linceses of imported modules are covered in 'python-webuntis_LICENSE.txt' and 'pyperclip_LICENSE.txt'.
 
 
 
