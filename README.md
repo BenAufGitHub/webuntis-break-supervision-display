@@ -78,7 +78,7 @@
    
 ## LICENSE NOTICE
     License information is convered in 'LICENSE.txt'.
-    Linceses of imported modules are covered in 'python-webuntis_LICENSE.txt' and 'pyperclip_LICENSE.txt'.
+    Licenses of imported modules are covered in 'python-webuntis_LICENSE.txt' and 'pyperclip_LICENSE.txt'.
 
 
 
